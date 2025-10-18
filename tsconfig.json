@@ -1,8 +1,6 @@
 {
   "compilerOptions": {
-    "module": "nodenext",
-    "moduleResolution": "nodenext",
-    "resolvePackageJsonExports": true,
+    "module": "commonjs",
     "esModuleInterop": true,
     "isolatedModules": true,
     "declaration": true,
@@ -18,7 +16,7 @@
     "strict": true,
     "skipLibCheck": true,
     "strictNullChecks": true,
-    "forceConsistentCasingInFileNames": true,
+    "forceConsistentCasingInFileNames": false,
     "noImplicitAny": false,
     "strictBindCallApply": false,
     "noFallthroughCasesInSwitch": false
