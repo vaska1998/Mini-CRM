@@ -5,6 +5,7 @@ import { UserModule } from './user/user.module';
 import * as process from 'node:process';
 import { configValidationSchema } from './config.schema';
 import { MongooseModule } from '@nestjs/mongoose';
+import { CompanyModule } from './company/company.module';
 
 @Module({
   imports: [
@@ -22,7 +23,9 @@ import { MongooseModule } from '@nestjs/mongoose';
       }),
       inject: [ConfigService],
     }),
+    CompanyModule,
   ],
   controllers: [],
+  providers: [],
 })
 export class AppModule {}

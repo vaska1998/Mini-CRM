@@ -1,17 +1,9 @@
 import { Prop, Schema, SchemaFactory, MongooseModule } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
-import { v4 as uuid } from 'uuid';
-
-const safeUuid = uuid as unknown as () => string;
+import { CollectionRootEntity } from '../entities/collection.root.entity';
 
 @Schema()
-export class User {
-  @Prop({
-    type: String,
-    default: (): string => safeUuid(),
-  })
-  _id!: string;
-
+export class User extends CollectionRootEntity {
   @Prop({ required: true })
   email!: string;
 
