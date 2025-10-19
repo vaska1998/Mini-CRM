@@ -13,6 +13,17 @@ async function bootstrap() {
       .setTitle('Mini-CRM API Doc')
       .setDescription('API Documentation for Mini-CRM')
       .setVersion('1.0')
+      .addBearerAuth(
+        {
+          type: 'http',
+          scheme: 'bearer',
+          bearerFormat: 'JWT',
+          in: 'header',
+          name: 'Authorization',
+          description: 'Enter JWT token',
+        },
+        'access-token',
+      )
       .build();
     const document = SwaggerModule.createDocument(app, config);
     SwaggerModule.setup('api/docs', app, document);

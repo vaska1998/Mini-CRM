@@ -21,9 +21,15 @@ import { JwtAuthGuard } from '../guards/jwt-auth.guard';
 import { CreateCompanyDto } from './dto/createCompany.dto';
 import { CompanyEntity } from './entity/company.entity';
 import { Express } from 'express';
-import { ApiCreatedResponse, ApiOperation } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiCreatedResponse,
+  ApiOperation,
+  ApiUnauthorizedResponse,
+} from '@nestjs/swagger';
 import { UpdateCompanyDto } from './dto/updateCompany.dto';
 
+@ApiBearerAuth('access-token')
 @Controller('company')
 export class CompanyController {
   private logger = new Logger('CompanyController');
@@ -37,6 +43,9 @@ export class CompanyController {
   })
   @ApiCreatedResponse({
     description: 'Company created successfully',
+  })
+  @ApiUnauthorizedResponse({
+    description: 'Unauthorized',
   })
   @UseInterceptors(FileInterceptor('logo'))
   @UseGuards(JwtAuthGuard)
@@ -59,6 +68,9 @@ export class CompanyController {
   @ApiCreatedResponse({
     description: 'Get all companies successfully',
   })
+  @ApiUnauthorizedResponse({
+    description: 'Unauthorized',
+  })
   @UseGuards(JwtAuthGuard)
   async findAll(): Promise<CompanyEntity[]> {
     this.logger.log(`Getting all companies`);
@@ -75,6 +87,9 @@ export class CompanyController {
   @ApiCreatedResponse({
     description: 'Get company by id successfully',
   })
+  @ApiUnauthorizedResponse({
+    description: 'Unauthorized',
+  })
   @UseGuards(JwtAuthGuard)
   async findOne(@Param('id') id: string): Promise<CompanyEntity> {
     this.logger.log(`Getting company by id: ${id}`);
@@ -90,6 +105,9 @@ export class CompanyController {
   })
   @ApiCreatedResponse({
     description: 'Update company by id successfully',
+  })
+  @ApiUnauthorizedResponse({
+    description: 'Unauthorized',
   })
   @UseGuards(JwtAuthGuard)
   async update(
@@ -111,6 +129,9 @@ export class CompanyController {
   })
   @ApiCreatedResponse({
     description: 'Delete company by id successfully',
+  })
+  @ApiUnauthorizedResponse({
+    description: 'Unauthorized',
   })
   @UseGuards(JwtAuthGuard)
   async delete(@Param('id') id: string): Promise<void> {

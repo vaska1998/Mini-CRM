@@ -33,6 +33,10 @@ export class CompanyService {
     return this.companyModel.find().exec();
   }
 
+  async findManyByIds(ids: string[]): Promise<Company[]> {
+    return this.companyModel.find({ _id: { $in: ids } }).exec();
+  }
+
   async findOne(id: string): Promise<Company> {
     const company = await this.companyModel.findById(id).exec();
     if (!company) throw new NotFoundException('Company not found');
