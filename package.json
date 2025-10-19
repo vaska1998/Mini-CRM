@@ -23,6 +23,7 @@
     "seed": "set ENV=local& ts-node -r tsconfig-paths/register src/database/seed.ts"
   },
   "dependencies": {
+    "@faker-js/faker": "^10.1.0",
     "@hapi/joi": "^17.1.1",
     "@nestjs/common": "^11.0.1",
     "@nestjs/config": "^4.0.2",
