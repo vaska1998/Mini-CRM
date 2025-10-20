@@ -7,6 +7,7 @@ import { configValidationSchema } from './config.schema';
 import { MongooseModule } from '@nestjs/mongoose';
 import { CompanyModule } from './company/company.module';
 import { EmployeeModule } from './employee/employee.module';
+import { NotificationsModule } from './notifications/notifications.module';
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { EmployeeModule } from './employee/employee.module';
     }),
     CompanyModule,
     EmployeeModule,
+    NotificationsModule,
   ],
   controllers: [],
   providers: [],

@@ -13,6 +13,7 @@ import { UpdateCompanyDto } from './dto/updateCompany.dto';
 import { UploadedLogoFile } from './dto/file.interface';
 import sharp, { Metadata } from 'sharp';
 import { EmployeeService } from '../employee/employee.service';
+import { NotificationsService } from '../notifications/notifications.service';
 
 @Injectable()
 export class CompanyService {
@@ -20,6 +21,7 @@ export class CompanyService {
     @InjectModel(Company.name) private companyModel: Model<CompanyDocument>,
     @Inject(forwardRef(() => EmployeeService))
     private employeeService: EmployeeService,
+    private readonly notificationsService: NotificationsService,
   ) {}
 
   async create(
@@ -30,8 +32,9 @@ export class CompanyService {
       ...dto,
       ...(file ? { logo: file.buffer, logoMimeType: file.mimetype } : {}),
     });
-
-    return company.save();
+    const savedCompany = await company.save();
+    await this.notificationsService.sendNewCompanyNotification(savedCompany);
+    return savedCompany;
   }
 
   async findAll(
