@@ -9,6 +9,7 @@ import {
   Param,
   Patch,
   Post,
+  Query,
   UploadedFile,
   UseGuards,
   UseInterceptors,
@@ -25,9 +26,11 @@ import {
   ApiBearerAuth,
   ApiCreatedResponse,
   ApiOperation,
+  ApiQuery,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 import { UpdateCompanyDto } from './dto/updateCompany.dto';
+import { CompaniesResponseDto } from './dto/companies.res.dto';
 
 @ApiBearerAuth('access-token')
 @Controller('company')
@@ -71,11 +74,57 @@ export class CompanyController {
   @ApiUnauthorizedResponse({
     description: 'Unauthorized',
   })
+  @ApiQuery({
+    name: 'search',
+    required: false,
+    type: String,
+    description: 'Search companies by name or other criteria',
+    example: 'John',
+  })
+  @ApiQuery({
+    name: 'employeeId',
+    required: false,
+    type: String,
+    description: 'Filter companies by employee ID',
+    example: '123bgd',
+  })
+  @ApiQuery({
+    name: 'page',
+    required: false,
+    type: Number,
+    description: 'Page number for pagination',
+    example: 1,
+  })
+  @ApiQuery({
+    name: 'limit',
+    required: false,
+    type: Number,
+    description: 'Number of employees per page',
+    example: 10,
+  })
   @UseGuards(JwtAuthGuard)
-  async findAll(): Promise<CompanyEntity[]> {
-    this.logger.log(`Getting all companies`);
-    const companies = await this.companyService.findAll();
-    return companies.map((company) => CompanyEntity.encode(company));
+  async findAll(
+    @Query('search') search?: string,
+    @Query('employeeId') employeeId?: string,
+    @Query('page') page = 1,
+    @Query('limit') limit = 10,
+  ): Promise<CompaniesResponseDto> {
+    this.logger.log(
+      `Getting companies (search=${search}, employeeId=${employeeId}, page=${page}, limit=${limit})`,
+    );
+    const { data, total } = await this.companyService.findAll(
+      search,
+      employeeId,
+      Number(page),
+      Number(limit),
+    );
+
+    return {
+      data: data.map((c) => CompanyEntity.encode(c)),
+      total,
+      page: Number(page),
+      limit: Number(limit),
+    };
   }
 
   @Get('/:id')

@@ -1,20 +1,25 @@
 import {
   BadRequestException,
+  forwardRef,
+  Inject,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Company, CompanyDocument } from './company.model';
-import { Model } from 'mongoose';
+import { FilterQuery, Model } from 'mongoose';
 import { CreateCompanyDto } from './dto/createCompany.dto';
 import { UpdateCompanyDto } from './dto/updateCompany.dto';
 import { UploadedLogoFile } from './dto/file.interface';
 import sharp, { Metadata } from 'sharp';
+import { EmployeeService } from '../employee/employee.service';
 
 @Injectable()
 export class CompanyService {
   constructor(
     @InjectModel(Company.name) private companyModel: Model<CompanyDocument>,
+    @Inject(forwardRef(() => EmployeeService))
+    private employeeService: EmployeeService,
   ) {}
 
   async create(
@@ -29,8 +34,36 @@ export class CompanyService {
     return company.save();
   }
 
-  async findAll(): Promise<Company[]> {
-    return this.companyModel.find().exec();
+  async findAll(
+    search?: string,
+    employeeId?: string,
+    page = 1,
+    limit = 10,
+  ): Promise<{ data: Company[]; total: number }> {
+    const filter: FilterQuery<CompanyDocument> = {};
+
+    if (search) {
+      filter.name = { $regex: search, $options: 'i' };
+    }
+
+    if (employeeId) {
+      const employee = await this.employeeService.findOne(employeeId);
+
+      if (!employee.companies?.length) {
+        return { data: [], total: 0 };
+      }
+
+      filter._id = { $in: employee.companies };
+    }
+
+    const skip = (page - 1) * limit;
+
+    const [data, total] = await Promise.all([
+      this.companyModel.find(filter).skip(skip).limit(limit).exec(),
+      this.companyModel.countDocuments(filter).exec(),
+    ]);
+
+    return { data, total };
   }
 
   async findManyByIds(ids: string[]): Promise<Company[]> {

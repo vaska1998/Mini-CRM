@@ -7,7 +7,7 @@ import {
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Employee, EmployeeDocument } from './employee.model';
-import { Model } from 'mongoose';
+import { Model, FilterQuery } from 'mongoose';
 import { CreateEmployeeDto } from './dto/create.employee.dto';
 import { UpdateEmployeeDto } from './dto/update.employee.dto';
 import { CompanyService } from '../company/company.service';
@@ -41,8 +41,37 @@ export class EmployeeService {
     return createdEmployee.save();
   }
 
-  async findAll(): Promise<Employee[]> {
-    return this.employeeModel.find().exec();
+  async findAll(
+    search?: string,
+    companyId?: string,
+    page = 1,
+    limit = 10,
+  ): Promise<{ data: Employee[]; total: number }> {
+    const filter: FilterQuery<EmployeeDocument> = {};
+
+    if (search) {
+      const matchedCompanies = await this.companyService.findAll(search);
+      const matchedCompanyIds = matchedCompanies.data.map((c) => c._id);
+
+      filter.$or = [
+        { firstName: { $regex: search, $options: 'i' } },
+        { lastName: { $regex: search, $options: 'i' } },
+        { companies: { $in: matchedCompanyIds } },
+      ];
+    }
+
+    if (companyId) {
+      filter.companies = companyId;
+    }
+
+    const skip = (page - 1) * limit;
+
+    const [data, total] = await Promise.all([
+      this.employeeModel.find(filter).skip(skip).limit(limit).exec(),
+      this.employeeModel.countDocuments(filter).exec(),
+    ]);
+
+    return { data, total };
   }
 
   async findOne(id: string): Promise<Employee> {

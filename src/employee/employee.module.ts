@@ -8,5 +8,6 @@ import { CompanyModule } from '../company/company.module';
   imports: [EmployeeMongooseModule, forwardRef(() => CompanyModule)],
   controllers: [EmployeeController],
   providers: [EmployeeService],
+  exports: [EmployeeService],
 })
 export class EmployeeModule {}

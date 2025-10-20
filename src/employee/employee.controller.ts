@@ -9,6 +9,7 @@ import {
   Param,
   Patch,
   Post,
+  Query,
   UseGuards,
   UsePipes,
   ValidationPipe,
@@ -18,11 +19,13 @@ import {
   ApiBearerAuth,
   ApiCreatedResponse,
   ApiOperation,
+  ApiQuery,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../guards/jwt-auth.guard';
 import { CreateEmployeeDto } from './dto/create.employee.dto';
 import { EmployeeEntity } from './entity/employee.entity';
+import { EmployeesResDto } from './dto/employees.res.dto';
 
 @ApiBearerAuth('access-token')
 @Controller('employee')
@@ -61,11 +64,56 @@ export class EmployeeController {
   @ApiUnauthorizedResponse({
     description: 'Unauthorized',
   })
+  @ApiQuery({
+    name: 'search',
+    required: false,
+    type: String,
+    description: 'Search employees by name or other criteria',
+    example: 'John',
+  })
+  @ApiQuery({
+    name: 'companyId',
+    required: false,
+    type: String,
+    description: 'Filter employees by company ID',
+    example: '123bgd',
+  })
+  @ApiQuery({
+    name: 'page',
+    required: false,
+    type: Number,
+    description: 'Page number for pagination',
+    example: 1,
+  })
+  @ApiQuery({
+    name: 'limit',
+    required: false,
+    type: Number,
+    description: 'Number of employees per page',
+    example: 10,
+  })
   @UseGuards(JwtAuthGuard)
-  async findAll(): Promise<EmployeeEntity[]> {
-    this.logger.log(`Getting all employees`);
-    const employees = await this.employeeService.findAll();
-    return employees.map((employee) => EmployeeEntity.encode(employee));
+  async findAll(
+    @Query('search') search?: string,
+    @Query('companyId') companyId?: string,
+    @Query('page') page = 1,
+    @Query('limit') limit = 10,
+  ): Promise<EmployeesResDto> {
+    this.logger.log(
+      `Getting employees (search=${search}, companyId=${companyId}, page=${page}, limit=${limit})`,
+    );
+    const { data, total } = await this.employeeService.findAll(
+      search,
+      companyId,
+      Number(page),
+      Number(limit),
+    );
+    return {
+      data: data.map((e) => EmployeeEntity.encode(e)),
+      total,
+      page: Number(page),
+      limit: Number(limit),
+    };
   }
 
   @Get('/:id')
