@@ -7,14 +7,14 @@ export class SignInReqDto {
   @IsEmail()
   @ApiProperty({
     description: 'Email of user',
-    default: 'new.student@email.com',
+    default: 'admin@admin.com',
   })
   email!: string;
 
   @IsString()
   @ApiProperty({
     description: 'Plaintext password of user',
-    default: 'Password1!',
+    default: 'password',
   })
   password!: string;
 }
