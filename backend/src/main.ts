@@ -7,6 +7,10 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const configService: ConfigService = app.get(ConfigService);
   const port: number = Number(configService.get('APP_PORT'));
+  app.enableCors({
+    origin: '*',
+    credentials: true,
+  });
 
   if (['local', 'dev'].includes(<string>configService.get('ENV'))) {
     const config = new DocumentBuilder()

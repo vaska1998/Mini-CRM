@@ -21,7 +21,7 @@ interface SimpleRequest {
   };
 }
 
-const API_URL = import.meta.env.REACT_APP_PUBLIC_API_URL ?? '';
+const API_URL = import.meta.env.REACT_APP_PUBLIC_API_URL ?? 'http://localhost:5555';
 
 export const getConnection = (req?: SimpleRequest): ConnectionType => {
   if (!req && typeof window == 'undefined') {
