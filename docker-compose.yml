@@ -1,0 +1,46 @@
+version: '3.8'
+
+services:
+  mongo:
+    image: mongo:6
+    container_name: mongo
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+
+  maildev:
+    image: maildev/maildev:2.1.0
+    container_name: maildev
+    ports:
+      - "1080:1080"
+      - "1025:1025"
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: mini-crm-backend
+    ports:
+      - "5555:5555"
+    depends_on:
+      - mongo
+      - maildev
+    env_file: ./backend/.env.local
+    command: sh -c "npm run start:prod"
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: mini-crm-frontend
+    ports:
+      - "5173:5173"
+    environment:
+      - REACT_APP_PUBLIC_API_URL=http://localhost:5555
+    command: npm run dev
+    depends_on:
+      - backend
+
+volumes:
+  mongo_data:
