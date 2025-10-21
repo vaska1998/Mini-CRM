@@ -14,6 +14,7 @@ import { UploadedLogoFile } from './dto/file.interface';
 import sharp, { Metadata } from 'sharp';
 import { EmployeeService } from '../employee/employee.service';
 import { NotificationsService } from '../notifications/notifications.service';
+import { LogoResDto } from './dto/logo.res.dto';
 
 @Injectable()
 export class CompanyService {
@@ -77,6 +78,17 @@ export class CompanyService {
     const company = await this.companyModel.findById(id).exec();
     if (!company) throw new NotFoundException('Company not found');
     return company;
+  }
+
+  async getLogo(id: string): Promise<LogoResDto | null> {
+    const company = await this.findOne(id);
+    if (!company.logo || !company.logoMimeType) {
+      return null;
+    }
+    return {
+      data: company.logo.toString('base64'),
+      mimeType: company.logoMimeType,
+    };
   }
 
   async update(

@@ -33,6 +33,7 @@ import {
 } from '@nestjs/swagger';
 import { UpdateCompanyDto } from './dto/updateCompany.dto';
 import { CompaniesResponseDto } from './dto/companies.res.dto';
+import { LogoResDto } from './dto/logo.res.dto';
 
 @ApiBearerAuth('access-token')
 @Controller('company')
@@ -171,6 +172,24 @@ export class CompanyController {
     return CompanyEntity.encode(company);
   }
 
+  @Get('/:id/logo')
+  @UsePipes(ValidationPipe)
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    summary: 'Get company logo by id',
+  })
+  @ApiCreatedResponse({
+    description: 'Get company logo by id successfully',
+  })
+  @ApiUnauthorizedResponse({
+    description: 'Unauthorized',
+  })
+  @UseGuards(JwtAuthGuard)
+  async getLogo(@Param('id') id: string): Promise<LogoResDto | null> {
+    this.logger.log(`Getting company logo by id: ${id}`);
+    return this.companyService.getLogo(id);
+  }
+
   @Patch('/:id')
   @UsePipes(ValidationPipe)
   @HttpCode(HttpStatus.OK)
@@ -184,6 +203,7 @@ export class CompanyController {
     description: 'Unauthorized',
   })
   @ApiConsumes('multipart/form-data')
+  @UseInterceptors(FileInterceptor('logo'))
   @ApiBody({
     description: 'Create company (optional logo upload)',
     schema: {

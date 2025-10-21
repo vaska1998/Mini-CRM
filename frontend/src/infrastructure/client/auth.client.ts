@@ -11,9 +11,7 @@ export class AuthClient extends _RootClient {
     super(proxy);
   }
 
-    signin(
-    content: AuthLoginSignInRequest,
-  ): Promise<ClientResponse<AuthLoginSignInResponse>> {
+    signin(content: AuthLoginSignInRequest,): Promise<ClientResponse<AuthLoginSignInResponse>> {
     return this.proxy.post('/auth/signin', content);
   }
 }

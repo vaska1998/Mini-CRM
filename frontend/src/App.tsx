@@ -13,10 +13,12 @@ import { createClientManager } from './infrastructure/client/manager.ts';
 import { AxiosProxy } from './infrastructure/client/proxy/axios.proxy.ts';
 import React from 'react';
 import Login from './pages/Login.tsx';
-import Companies from './pages/Companies.tsx';
+import CompaniesList from './pages/CompaniesList.tsx';
 import { useAppUser } from './contexts/user.context.tsx';
 import { AppUserProvider } from './providers/AppUserProvider.tsx';
 import Employees from './pages/Employees.tsx';
+import CompanyDetails from "./pages/CompanyDetails.tsx";
+import CreateCompany from "./pages/CreateCompany.tsx";
 
 const PrivateRoute: React.FC<{ children: React.ReactNode }> = ({
   children,
@@ -56,10 +58,26 @@ export default function App() {
             path="/companies"
             element={
               <PrivateRoute>
-                <Companies />
+                <CompaniesList />
               </PrivateRoute>
             }
           />
+            <Route
+                path="/companies/:id"
+                element={
+                    <PrivateRoute>
+                        <CompanyDetails/>
+                    </PrivateRoute>
+                }
+            />
+            <Route
+                path="/companies/create"
+                element={
+                    <PrivateRoute>
+                        <CreateCompany/>
+                    </PrivateRoute>
+                }
+            />
           <Route
             path="/employees"
             element={
