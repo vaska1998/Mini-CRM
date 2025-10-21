@@ -17,7 +17,7 @@ services:
       - "1025:1025"
 
   app:
-    build: .
+    build: ..
     container_name: mini-crm
     ports:
       - "5555:5555"
