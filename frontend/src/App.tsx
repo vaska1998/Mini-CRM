@@ -16,9 +16,11 @@ import Login from './pages/Login.tsx';
 import CompaniesList from './pages/CompaniesList.tsx';
 import { useAppUser } from './contexts/user.context.tsx';
 import { AppUserProvider } from './providers/AppUserProvider.tsx';
-import Employees from './pages/Employees.tsx';
+import EmployeesList from './pages/EmployeesList.tsx';
 import CompanyDetails from "./pages/CompanyDetails.tsx";
 import CreateCompany from "./pages/CreateCompany.tsx";
+import EmployeeDetails from "./pages/EmployeeDetails.tsx";
+import CreateEmployee from "./pages/CreateEmployee.tsx";
 
 const PrivateRoute: React.FC<{ children: React.ReactNode }> = ({
   children,
@@ -82,10 +84,26 @@ export default function App() {
             path="/employees"
             element={
               <PrivateRoute>
-                <Employees />
+                <EmployeesList />
               </PrivateRoute>
             }
           />
+            <Route
+                path="/employees/:id"
+                element={
+                    <PrivateRoute>
+                        <EmployeeDetails />
+                    </PrivateRoute>
+                }
+            />
+            <Route
+                path="/employees/create"
+                element={
+                    <PrivateRoute>
+                        <CreateEmployee />
+                    </PrivateRoute>
+                }
+            />
           <Route
             path="*"
             element={
