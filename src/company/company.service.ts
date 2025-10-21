@@ -105,21 +105,38 @@ export class CompanyService {
   async processLogo(
     file?: UploadedLogoFile,
   ): Promise<UploadedLogoFile | undefined> {
-    let logoFile: UploadedLogoFile | undefined;
+    if (!file) return undefined;
 
-    if (file) {
-      const multerFile: UploadedLogoFile = {
-        buffer: file.buffer,
-        mimetype: file.mimetype,
-      };
-
-      const metadata: Metadata = await sharp(multerFile.buffer).metadata();
-      if (metadata.width < 100 || metadata.height < 100) {
-        throw new BadRequestException('Logo must be at least 100×100 pixels');
-      }
-
-      logoFile = multerFile;
+    const allowedMimeTypes = [
+      'image/png',
+      'image/jpeg',
+      'image/jpg',
+      'image/webp',
+    ];
+    if (!allowedMimeTypes.includes(file.mimetype)) {
+      throw new BadRequestException('Logo must be a PNG, JPG, or WEBP image');
     }
-    return logoFile;
+
+    let metadata: Metadata;
+    try {
+      metadata = await sharp(file.buffer).metadata();
+    } catch {
+      throw new BadRequestException(
+        'Invalid image file — cannot read metadata',
+      );
+    }
+
+    if (!metadata.width || !metadata.height) {
+      throw new BadRequestException('Invalid image dimensions');
+    }
+
+    if (metadata.width < 100 || metadata.height < 100) {
+      throw new BadRequestException('Logo must be at least 100×100 pixels');
+    }
+
+    return {
+      buffer: file.buffer,
+      mimetype: file.mimetype,
+    };
   }
 }

@@ -24,6 +24,8 @@ import { CompanyEntity } from './entity/company.entity';
 import { Express } from 'express';
 import {
   ApiBearerAuth,
+  ApiBody,
+  ApiConsumes,
   ApiCreatedResponse,
   ApiOperation,
   ApiQuery,
@@ -51,6 +53,29 @@ export class CompanyController {
     description: 'Unauthorized',
   })
   @UseInterceptors(FileInterceptor('logo'))
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    description: 'Create company (optional logo upload)',
+    schema: {
+      type: 'object',
+      properties: {
+        name: { type: 'string', example: 'Test', nullable: false },
+        email: { type: 'string', example: 'test@test.com', nullable: true },
+        website: {
+          type: 'string',
+          example: 'https://test.com',
+          nullable: true,
+        },
+        logo: {
+          type: 'string',
+          format: 'binary',
+          nullable: true,
+          description: 'Optional company logo file',
+        },
+      },
+      required: ['name'],
+    },
+  })
   @UseGuards(JwtAuthGuard)
   async create(
     @UploadedFile() file: Express.Multer.File,
@@ -157,6 +182,28 @@ export class CompanyController {
   })
   @ApiUnauthorizedResponse({
     description: 'Unauthorized',
+  })
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    description: 'Create company (optional logo upload)',
+    schema: {
+      type: 'object',
+      properties: {
+        name: { type: 'string', example: 'Test', nullable: true },
+        email: { type: 'string', example: 'test@test.com', nullable: true },
+        website: {
+          type: 'string',
+          example: 'https://test.com',
+          nullable: true,
+        },
+        logo: {
+          type: 'string',
+          format: 'binary',
+          nullable: true,
+          description: 'Optional company logo file',
+        },
+      },
+    },
   })
   @UseGuards(JwtAuthGuard)
   async update(
