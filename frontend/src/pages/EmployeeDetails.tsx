@@ -49,6 +49,7 @@ const EmployeeDetails = () => {
                                 if (res.type === "SUCCESS") {
                                     setEmployee(res.result);
                                     setIsEditing(false);
+                                    navigate(`/employees/${id}`);
                                 } else {
                                     console.error(res);
                                 }

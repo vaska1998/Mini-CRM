@@ -45,11 +45,9 @@ export class CreateEmployeeDto {
 
   @IsOptional()
   @IsArray()
-  @IsMongoId({ each: true })
   @ApiProperty({
     description: 'Companies of employee',
     example: ['652abc...', '652def...'],
   })
-  @ValidateNested({ each: true })
   companies?: string[];
 }
