@@ -18,7 +18,7 @@ const CreateEmployee = () => {
 
     useEffect(() => {
         const { client } = getConnection();
-        client.company.getCompanies().then(res => {
+        client.company.getCompanies('', '', 1, 1000).then(res => {
             if (res.type === "SUCCESS") {
                 setCompanies(res.result.data);
             }
