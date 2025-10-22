@@ -23,9 +23,9 @@ const CompaniesList = () => {
 
     useEffect(() => {
         const {client} = getConnection();
-        client.employee.getEmployees('', '', 1, 1000).then(res => {
+        client.employee.getAll().then(res => {
             if (res.type === 'SUCCESS') {
-                setEmployees(res.result.data);
+                setEmployees(res.result);
             } else {
                 console.error(res);
             }
@@ -37,7 +37,7 @@ const CompaniesList = () => {
         setState({
             type: 'FETCH',
         });
-        client.company.getCompanies(search, selectedEmployee, page, limit).then(res => {
+        client.company.getCompaniesWithFilter(search, selectedEmployee, page, limit).then(res => {
             if (res.type === 'SUCCESS') {
                 setState({
                     type: "EMPTY"
@@ -90,7 +90,7 @@ const CompaniesList = () => {
                         <option value="">All Employees</option>
                         {employees.map((emp) => (
                             <option key={emp.id} value={emp.id}>
-                                {emp.firstName} ({emp.lastName})
+                                {emp.firstName} {emp.lastName}
                             </option>
                         ))}
                     </select>

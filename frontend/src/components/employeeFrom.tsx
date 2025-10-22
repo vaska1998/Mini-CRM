@@ -15,9 +15,9 @@ const EmployeeForm: React.FC<CompanyFormProps> = ({ initialData, onSubmit, submi
 
     useEffect(() => {
         const { client } = getConnection();
-        client.company.getCompanies('', '', 1, 1000).then(res => {
+        client.company.getAll().then(res => {
             if (res.type === "SUCCESS") {
-                setCompanies(res.result.data);
+                setCompanies(res.result);
             }
         })
     }, [])

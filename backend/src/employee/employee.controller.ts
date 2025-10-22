@@ -64,6 +64,25 @@ export class EmployeeController {
   @ApiUnauthorizedResponse({
     description: 'Unauthorized',
   })
+  @UseGuards(JwtAuthGuard)
+  async findAll(): Promise<EmployeeEntity[]> {
+    this.logger.log(`Getting all employees`);
+    const employees = await this.employeeService.findAll();
+    return employees.map((e) => EmployeeEntity.encode(e));
+  }
+
+  @Get('/filter')
+  @UsePipes(ValidationPipe)
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    summary: 'Get all employees by filter',
+  })
+  @ApiCreatedResponse({
+    description: 'Get all employees by filter successfully',
+  })
+  @ApiUnauthorizedResponse({
+    description: 'Unauthorized',
+  })
   @ApiQuery({
     name: 'search',
     required: false,
@@ -93,7 +112,7 @@ export class EmployeeController {
     example: 10,
   })
   @UseGuards(JwtAuthGuard)
-  async findAll(
+  async findAllWithFilter(
     @Query('search') search?: string,
     @Query('companyId') companyId?: string,
     @Query('page') page = 1,
@@ -102,7 +121,7 @@ export class EmployeeController {
     this.logger.log(
       `Getting employees (search=${search}, companyId=${companyId}, page=${page}, limit=${limit})`,
     );
-    const { data, total } = await this.employeeService.findAll(
+    const { data, total } = await this.employeeService.findAllWithFilter(
       search,
       companyId,
       Number(page),

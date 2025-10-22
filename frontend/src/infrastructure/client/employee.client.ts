@@ -11,16 +11,20 @@ export class EmployeeClient extends _RootClient{
         super(proxy);
     }
 
-    getEmployees(search?: string, companyId?: string, page?: number, limit: number = 10): Promise<ClientResponse<EmployeesResDto>> {
+    getAll(): Promise<ClientResponse<EmployeeDto[]>> {
+        return this.proxy.get('/employee');
+    }
+
+    getEmployeesByFilter(search?: string, companyId?: string, page?: number, limit: number = 10): Promise<ClientResponse<EmployeesResDto>> {
         const params = new URLSearchParams();
 
         if (search) params.append('search', search);
-        if (companyId) params.append('employeeId', companyId);
+        if (companyId) params.append('companyId', companyId);
         if (page) params.append('page', page.toString());
         if (limit) params.append('limit', limit.toString());
 
         const query = params.toString();
-        const link = `/employee${query ? `?${query}` : ''}`;
+        const link = `/employee/filter${query ? `?${query}` : ''}`;
         return this.proxy.get(link);
     }
 

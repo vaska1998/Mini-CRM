@@ -4,9 +4,12 @@ import Header from "../components/Header.tsx";
 import Pagination from "../components/Pagination.tsx";
 import type {EmployeeDto} from "../infrastructure/dto/employee/employee.dto.ts";
 import {getConnection} from "../tools/connections.ts";
+import type {CompanyResDto} from "../infrastructure/dto/company/company.res.dto.ts";
 
 const EmployeesList = () => {
     const [employees, setEmployees] = useState<EmployeeDto[]>([]);
+    const [companies, setCompanies] = useState<CompanyResDto[]>([]);
+    const [selectedCompany, setSelectedCompany] = useState<string>('');
     const [page, setPage] = useState(1);
     const [search, setSearch] = useState('');
     const [total, setTotal] = useState(0);
@@ -15,7 +18,18 @@ const EmployeesList = () => {
 
     useEffect(() => {
         const {client} = getConnection();
-        client.employee.getEmployees(search, '', page, limit).then(res => {
+        client.company.getAll().then(res => {
+            if (res.type === 'SUCCESS') {
+                setCompanies(res.result)
+            } else {
+                console.error(res);
+            }
+        })
+    }, []);
+
+    useEffect(() => {
+        const {client} = getConnection();
+        client.employee.getEmployeesByFilter(search, selectedCompany, page, limit).then(res => {
             if (res.type === 'SUCCESS') {
                 setEmployees(res.result.data)
                 setTotal(res.result.total)
@@ -24,7 +38,7 @@ const EmployeesList = () => {
             }
         })
 
-    }, [search, page, limit])
+    }, [search, page, limit, selectedCompany]);
 
     const deleteEmployee = (id: string) => {
         const {client} = getConnection();
@@ -49,6 +63,18 @@ const EmployeesList = () => {
                         onChange={(e) => setSearch(e.target.value)}
                         className="border rounded px-3 py-2 w-1/3"
                     />
+                    <select
+                        value={selectedCompany}
+                        onChange={(e) => setSelectedCompany(e.target.value)}
+                        className="border rounded px-3 py-2"
+                    >
+                        <option value="">All Companies</option>
+                        {companies.map((com) => (
+                            <option key={com.id} value={com.id}>
+                                {com.name}
+                            </option>
+                        ))}
+                    </select>
                     <button className="px-4 py-2 bg-blue-500 text-white rounded cursor-pointer" onClick={() => navigate('/employees/create')}>+ Add Employee</button>
                 </div>
                 <table className="w-full border border-gray-200 text-left">

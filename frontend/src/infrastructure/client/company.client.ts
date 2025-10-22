@@ -10,7 +10,11 @@ export class CompanyClient extends _RootClient {
         super(proxy);
     }
 
-    getCompanies(search?: string, employeeId?: string, page?: number, limit: number = 10): Promise<ClientResponse<CompaniesResDto>> {
+    getAll(): Promise<ClientResponse<CompanyResDto[]>> {
+        return this.proxy.get('/company');
+    }
+
+    getCompaniesWithFilter(search?: string, employeeId?: string, page?: number, limit: number = 10): Promise<ClientResponse<CompaniesResDto>> {
         const params = new URLSearchParams();
 
         if (search) params.append('search', search);
@@ -19,7 +23,7 @@ export class CompanyClient extends _RootClient {
         if (limit) params.append('limit', limit.toString());
 
         const query = params.toString();
-        const link = `/company${query ? `?${query}` : ''}`;
+        const link = `/company/filter${query ? `?${query}` : ''}`;
         return this.proxy.get(link);
     }
 

@@ -41,27 +41,41 @@ export class EmployeeService {
     return createdEmployee.save();
   }
 
-  async findAll(
+  async findAll(): Promise<Employee[]> {
+    return this.employeeModel.find().exec();
+  }
+
+  async findAllWithFilter(
     search?: string,
     companyId?: string,
     page = 1,
     limit = 10,
   ): Promise<{ data: Employee[]; total: number }> {
     const filter: FilterQuery<EmployeeDocument> = {};
+    const andConditions: FilterQuery<EmployeeDocument>[] = [];
 
     if (search) {
-      const matchedCompanies = await this.companyService.findAll(search);
+      const matchedCompanies =
+        await this.companyService.findAllByFilter(search);
       const matchedCompanyIds = matchedCompanies.data.map((c) => c._id);
 
-      filter.$or = [
-        { firstName: { $regex: search, $options: 'i' } },
-        { lastName: { $regex: search, $options: 'i' } },
-        { companies: { $in: matchedCompanyIds } },
-      ];
+      andConditions.push({
+        $or: [
+          { firstName: { $regex: search, $options: 'i' } },
+          { lastName: { $regex: search, $options: 'i' } },
+          { companies: { $in: matchedCompanyIds } },
+        ],
+      } as FilterQuery<EmployeeDocument>);
     }
 
     if (companyId) {
-      filter.companies = companyId;
+      andConditions.push({
+        companies: companyId,
+      } as FilterQuery<EmployeeDocument>);
+    }
+
+    if (andConditions.length > 0) {
+      filter.$and = andConditions;
     }
 
     const skip = (page - 1) * limit;

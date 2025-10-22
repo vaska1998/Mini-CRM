@@ -24,11 +24,6 @@ export class CompanySeeder {
           provider: domain,
         }),
         website: `https://www.${domain}`,
-        logo: Buffer.from(
-          faker.image.dataUri({ width: 100, height: 100 }).split(',')[1],
-          'base64',
-        ),
-        logoMimeType: 'image/png',
       };
     });
 

@@ -100,6 +100,25 @@ export class CompanyController {
   @ApiUnauthorizedResponse({
     description: 'Unauthorized',
   })
+  @UseGuards(JwtAuthGuard)
+  async findAll(): Promise<CompanyEntity[]> {
+    this.logger.log(`Getting all companies`);
+    const companies = await this.companyService.findAll();
+    return companies.map((c) => CompanyEntity.encode(c));
+  }
+
+  @Get('/filter')
+  @UsePipes(ValidationPipe)
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    summary: 'Get all companies by filter',
+  })
+  @ApiCreatedResponse({
+    description: 'Get all companies by filter successfully',
+  })
+  @ApiUnauthorizedResponse({
+    description: 'Unauthorized',
+  })
   @ApiQuery({
     name: 'search',
     required: false,
@@ -129,7 +148,7 @@ export class CompanyController {
     example: 10,
   })
   @UseGuards(JwtAuthGuard)
-  async findAll(
+  async findAllByFilter(
     @Query('search') search?: string,
     @Query('employeeId') employeeId?: string,
     @Query('page') page = 1,
@@ -138,7 +157,7 @@ export class CompanyController {
     this.logger.log(
       `Getting companies (search=${search}, employeeId=${employeeId}, page=${page}, limit=${limit})`,
     );
-    const { data, total } = await this.companyService.findAll(
+    const { data, total } = await this.companyService.findAllByFilter(
       search,
       employeeId,
       Number(page),

@@ -38,7 +38,11 @@ export class CompanyService {
     return savedCompany;
   }
 
-  async findAll(
+  async findAll(): Promise<Company[]> {
+    return this.companyModel.find().exec();
+  }
+
+  async findAllByFilter(
     search?: string,
     employeeId?: string,
     page = 1,
