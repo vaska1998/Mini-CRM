@@ -112,6 +112,13 @@ export class EmployeeService {
     return employee;
   }
 
+  async removeCompany(companyId: string): Promise<void> {
+    await this.employeeModel.updateMany(
+      { companies: companyId },
+      { $pull: { companies: companyId } },
+    );
+  }
+
   async delete(id: string): Promise<void> {
     const result = await this.employeeModel.findByIdAndDelete(id).exec();
     if (!result) throw new NotFoundException('Employee not found');

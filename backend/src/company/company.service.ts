@@ -114,8 +114,10 @@ export class CompanyService {
   }
 
   async delete(id: string): Promise<void> {
-    const result = await this.companyModel.findByIdAndDelete(id).exec();
-    if (!result) throw new NotFoundException('Company not found');
+    const company = await this.findOne(id);
+    if (!company) throw new NotFoundException('Company not found');
+    await this.employeeService.removeCompany(id);
+    await this.companyModel.findByIdAndDelete(id);
   }
 
   async processLogo(
